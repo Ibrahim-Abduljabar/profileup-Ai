@@ -1,5 +1,6 @@
 
-
+import streamlit as st 
+import docx
 st.set_page_config(page_title="ProfileUp AI", page_icon="📝", layout="centered")
 st.title("📝 ProfileUp AI - صانع السير الذاتية")
 st.write("أدخل معلوماتك ببساطة ودع الذكاء الاصطناعي يتولى الصياغة الاحترافية.")
