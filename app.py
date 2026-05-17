@@ -22,7 +22,7 @@ if st.button("توليد السيرة الذاتية الاحترافية ✨"):
             client = Groq(api_key=st.secrets["GROQ_API_KEY"])
             prompt = f"قم بإنشاء سيرة ذاتية احترافية باللغة العربية: الاسم {name}، الوظيفة {job_title}، الخبرات {raw_experience}، التعليم {raw_education}، المهارات {raw_skills}."
             completion = client.chat.completions.create(model="llama3-8b-8192", messages=[{"role": "user", "content": prompt}])
-            completion = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}])
+            completion = client.chat.completions.create(model="groq/compound-mini", messages=[{"role": "user", "content": prompt}])
             st.markdown(cv_result)
 
             st.success("تم التوليد بنجاح!")
