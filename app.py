@@ -18,9 +18,13 @@ if st.button("توليد السيرة الذاتية الاحترافية ✨"):
         st.warning("الرجاء إدخال الاسم والمسمى الوظيفي على الأقل.")
     else:
         with st.spinner("جاري صياغة سيرتك الذاتية باحترافية..."):
-            
-            cv_result = generate_cv_logic(name, job_title, raw_experience, raw_education, raw_skills)
-            st.session_state['cv_text'] = cv_result
+            from groq import Groq
+            client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+            prompt = f"قم بإنشاء سيرة ذاتية احترافية باللغة العربية: الاسم {name}، الوظيفة {job_title}، الخبرات {raw_experience}، التعليم {raw_education}، المهارات {raw_skills}."
+            completion = client.chat.completions.create(model="llama3-8b-8192", messages=[{"role": "user", "content": prompt}])
+            cv_result = completion.choices.message.content
+            st.markdown(cv_result)
+
             st.success("تم التوليد بنجاح!")
 
 
