@@ -41,7 +41,7 @@ if st.button("✨ توليد السيرة الذاتية الاحترافية"):
                 )
                 
                 # استخراج النتيجة وعرضها للمستخدم
-                cv_result = completion.choices.message.content
+                cv_result = completion.choices[0].message.content
                 st.markdown(cv_result)
                 st.success("تم التوليد بنجاح!")
                 
