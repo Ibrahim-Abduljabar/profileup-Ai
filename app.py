@@ -1,49 +1,80 @@
 import streamlit as st
-import docx
 from groq import Groq
+import time
 
-# إعدادات واجهة التطبيق
-st.set_page_config(page_title="Profileup AI", page_icon="📄", layout="centered")
-st.title("📄 Profileup AI - صانع السير الذاتية")
-st.write("أدخل معلوماتك البسيطة لتوليد سيرة ذاتية احترافية بالذكاء الاصطناعي سريعاً.")
+# 1. ضبط إعدادات الصفحة
+st.set_page_config(
+    page_title="ProfileUp AI",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-# مدخلات المستخدم
-name = st.text_input("الاسم الكامل")
-job_title = st.text_input("المسمى الوظيفي المستهدف")
-raw_experience = st.text_area("الخبرات المهنية وسنوات العمل")
-raw_education = st.text_area("التعليم (الجامعة والتخصص والشهادات)")
-raw_skills = st.text_input("المهارات (افصل بينها بفاصلة)")
+# 2. ترويسة الموقع
+st.write("### ProfileUp AI - صانع السير الذاتية 📄✨")
+st.caption("أدخل بياناتك المهنية والذكاء الاصطناعي سيقوم بصياغة سيرة ذاتية متوافقة مع أنظمة الـ ATS فوراً")
+st.divider()
 
-if st.button("✨ توليد السيرة الذاتية الاحترافية"):
+# 3. الـ API والاتصال بـ Groq
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+client = Groq(api_key=GROQ_API_KEY)
+
+# 4. تهيئة الـ Session State لإدارة السير الذاتية المتعددة
+if "cv_list" not in st.session_state:
+    st.session_state.cv_list = [{"id": 0}]
+
+st.write("#### 🛠️ مدخلات السير الذاتية")
+
+# 5. حلقة لتكرار خانات إدخال السير الذاتية بناءً على طلبك
+for index, cv_item in enumerate(st.session_state.cv_list):
+    st.write(f"##### 📋 السيرة الذاتية رقم ({index + 1})")
+    
+    # استخدام Keys فريدة لكل خانة إدخال لمنع تعارض الـ Streamlit
+    name = st.text_input(f"الاسم الكامل:", key=f"name_{cv_item['id']}")
+    job_title = st.text_input(f"المسمى الوظيفي المستهدف:", key=f"title_{cv_item['id']}")
+    raw_experience = st.text_area(f"الخبرات المهنية وسنوات العمل:", height=100, key=f"exp_{cv_item['id']}")
+    raw_education = st.text_area(f"التعليم والشهادات الأكاديمية:", height=100, key=f"edu_{cv_item['id']}")
+    raw_skills = st.text_area(f"المهارات التقنية والشخصية:", height=100, key=f"skills_{cv_item['id']}")
+    
     if not name or not job_title:
-        st.warning("الرجاء إدخال الاسم والمسمى الوظيفي على الأقل.")
+        st.warning(f"⚠️ الرجاء إدخال الاسم والمسمى الوظيفي المستهدف للسيرة الذاتية رقم {index + 1}...")
     else:
-        with st.spinner("جاري صياغة سيرتك الذاتية بأعلى جودة..."):
-            try:
-                # الاتصال بسيرفر Groq ومفتاح الأمان
-                client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-                
-                # صياغة الأمر الموجه للذكاء الاصطناعي
-                prompt = f"""
-                أنت خبير توظيف ومحترف في كتابة السير الذاتية المتوافقة مع أنظمة الـ ATS.
-                قم بإنشاء سيرة ذاتية احترافية ومنظمة باللغة العربية بناءً على البيانات التالية:
-                الاسم: {name}
-                المسمى الوظيفي المستهدف: {job_title}
-                الخبرات: {raw_experience}
-                التعليم: {raw_education}
-                المهارات: {raw_skills}
-                """
-                
-                # إرسال الطلب لنموذج Llama 3 النشط والمستقر لعام 2026
-                completion = client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
-                    messages=[{"role": "user", "content": prompt}]
-                )
-                
-                # استخراج النتيجة وعرضها للمستخدم
-                cv_result = completion.choices[0].message.content
-                st.markdown(cv_result)
-                st.success("تم التوليد بنجاح!")
-                
-            except Exception as e:
-                st.error(f"حدث خطأ أثناء الاتصال بـ Groq: {e}")
+        # زر التشغيل لكل سيرة ذاتية بشكل مستقل
+        if st.button(f"🚀 صياغة السيرة الذاتية رقم {index + 1}", key=f"btn_{cv_item['id']}"):
+            with st.spinner("⏳ جاري صياغة السيرة الذاتية باحترافية..."):
+                try:
+                    prompt = f"""
+                    صيغ السيرة الذاتية التالية بطريقة متوافقة مع أنظمة الـ ATS وبأسلوب محترف للغاية باللغة العربية:
+                    
+                    الاسم: {name}
+                    المسمى الوظيفي: {job_title}
+                    الخبرات: {raw_experience}
+                    التعليم: {raw_education}
+                    المهارات: {raw_skills}
+                    
+                    ---
+                    المخرجات المطلوبة:
+                    قم بتنظيم المدخلات السابقة في سيرة ذاتية ممتازة تحتوي على الأقسام التالية:
+                    - الملخص المهني (Professional Summary).
+                    - الخبرات العملية (Work Experience) مصاغة بأسلوب الإنجازات.
+                    - التعليم والشهادات (Education).
+                    - المهارات التقنية والشخصية (Skills).
+                    """
+                    
+                    completion = client.chat.completions.create(
+                        model="llama-3.1-80b-instant",
+                        messages=[{"role": "user", "content": prompt}]
+                    )
+                    
+                    cv_result = completion.choices.message.content
+                    st.markdown(cv_result)
+                    st.success("✅ تم الفراغ من الصياغة بنجاح!")
+                except Exception as e:
+                    st.error(f"⚠️ حدث خطأ في الاتصال بـ Groq: {e}")
+                    
+    st.write("---")
+
+# 6. زر ديناميكي لإضافة سيرة ذاتية أخرى في نفس الصفحة
+if st.button("➕ إضافة سيرة ذاتية أخرى"):
+    new_id = len(st.session_state.cv_list)
+    st.session_state.cv_list.append({"id": new_id})
+    st.rerun()
