@@ -57,16 +57,16 @@ for index, cv_item in enumerate(st.session_state.cv_list):
                     - الملخص المهني (Professional Summary).
                     - الخبرات العملية (Work Experience) مصاغة بأسلوب الإنجازات.
                     - التعليم والشهادات (Education).
-                    - Mahrart (Skills).
+                    - المهارات التقنية والشخصية (Skills).
                     """
                     
-                    # تعديل الموديل هنا إلى لاما 3.3 لتلافي خطأ السيرفر
                     completion = client.chat.completions.create(
                         model="llama-3.3-70b-versatile",
                         messages=[{"role": "user", "content": prompt}]
                     )
                     
-                    cv_result = completion.choices.message.content
+                    # تعديل طريقة الوصول للنص لتفادي خطأ الـ AttributeError
+                    cv_result = completion.choices[0].message.content
                     st.markdown(cv_result)
                     st.success("✅ تم الفراغ من الصياغة بنجاح!")
                 except Exception as e:
