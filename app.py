@@ -2,33 +2,27 @@ import streamlit as st
 from groq import Groq
 import time
 
-# 1. ضبط إعدادات الصفحة
 st.set_page_config(
     page_title="ProfileUp AI",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# 2. ترويسة الموقع
 st.write("### ProfileUp AI - صانع السير الذاتية 📄✨")
 st.caption("أدخل بياناتك المهنية والذكاء الاصطناعي سيقوم بصياغة سيرة ذاتية متوافقة مع أنظمة الـ ATS فوراً")
 st.divider()
 
-# 3. الـ API والاتصال بـ Groq
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key=GROQ_API_KEY)
 
-# 4. تهيئة الـ Session State لإدارة السير الذاتية المتعددة
 if "cv_list" not in st.session_state:
     st.session_state.cv_list = [{"id": 0}]
 
 st.write("#### 🛠️ مدخلات السير الذاتية")
 
-# 5. حلقة لتكرار خانات إدخال السير الذاتية بناءً على طلبك
 for index, cv_item in enumerate(st.session_state.cv_list):
     st.write(f"##### 📋 السيرة الذاتية رقم ({index + 1})")
     
-    # استخدام Keys فريدة لكل خانة إدخال لمنع تعارض الـ Streamlit
     name = st.text_input(f"الاسم الكامل:", key=f"name_{cv_item['id']}")
     job_title = st.text_input(f"المسمى الوظيفي المستهدف:", key=f"title_{cv_item['id']}")
     raw_experience = st.text_area(f"الخبرات المهنية وسنوات العمل:", height=100, key=f"exp_{cv_item['id']}")
@@ -38,7 +32,6 @@ for index, cv_item in enumerate(st.session_state.cv_list):
     if not name or not job_title:
         st.warning(f"⚠️ الرجاء إدخال الاسم والمسمى الوظيفي المستهدف للسيرة الذاتية رقم {index + 1}...")
     else:
-        # زر التشغيل لكل سيرة ذاتية بشكل مستقل
         if st.button(f"🚀 صياغة السيرة الذاتية رقم {index + 1}", key=f"btn_{cv_item['id']}"):
             with st.spinner("⏳ جاري صياغة السيرة الذاتية باحترافية..."):
                 try:
@@ -65,7 +58,6 @@ for index, cv_item in enumerate(st.session_state.cv_list):
                         messages=[{"role": "user", "content": prompt}]
                     )
                     
-                    # تعديل طريقة الوصول للنص لتفادي خطأ الـ AttributeError
                     cv_result = completion.choices[0].message.content
                     st.markdown(cv_result)
                     st.success("✅ تم الفراغ من الصياغة بنجاح!")
@@ -74,7 +66,6 @@ for index, cv_item in enumerate(st.session_state.cv_list):
                     
     st.write("---")
 
-# 6. زر ديناميكي لإضافة سيرة ذاتية أخرى في نفس الصفحة
 if st.button("➕ إضافة سيرة ذاتية أخرى"):
     new_id = len(st.session_state.cv_list)
     st.session_state.cv_list.append({"id": new_id})
