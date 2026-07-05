@@ -3,7 +3,7 @@ from groq import Groq
 import time
 from logsnag import LogSnag
 
-log_client = LogSnag(token=st.secrets["LOGSNAG_TOKEN"], project="Profileup-Ai")
+log_client = LogSnag(token=st.secrets["LOGSNAG_TOKEN"], project="profileup-ai")
 log_client.track(channel="visits", event="New Visit")
 st.set_page_config(
     page_title="ProfileUp AI",
