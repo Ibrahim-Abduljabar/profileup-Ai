@@ -1,7 +1,10 @@
 import streamlit as st
 from groq import Groq
 import time
+from logsnag import LogSnag
 
+log_client = LogSnag(token=st.secrets["LOGSNAG_TOKEN"], project="اسم-المنصة")
+log_client.track(channel="visits", event="New Visit")
 st.set_page_config(
     page_title="ProfileUp AI",
     layout="centered",
